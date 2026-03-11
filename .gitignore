@@ -1,0 +1,141 @@
+# =============================================================================
+# STRICT SECURITY: API CREDENTIALS & SENSITIVE DATA
+# =============================================================================
+# This file prevents API keys, credentials, and sensitive configuration
+# from being committed to version control.
+
+# -----------------------------------------------------------------------------
+# Environment & Configuration Files
+# -----------------------------------------------------------------------------
+# Main environment file - CRITICAL: Contains API keys
+.env
+.env.*
+!.env.example
+!.env.template
+*.env
+
+# Any file that might contain credentials
+*.key
+*.pem
+*.crt
+*.secret
+*.credentials
+config.json
+config.yaml
+config.yml
+secrets.json
+secrets.yaml
+secrets.yml
+
+# -----------------------------------------------------------------------------
+# Python Virtual Environments & Cache
+# -----------------------------------------------------------------------------
+.venv/
+venv/
+env/
+ENV/
+.runtime/
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# -----------------------------------------------------------------------------
+# IDE & Editor
+# -----------------------------------------------------------------------------
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# -----------------------------------------------------------------------------
+# Logs & Temporary Files
+# -----------------------------------------------------------------------------
+*.log
+logs/
+tmp/
+temp/
+.cache/
+
+# -----------------------------------------------------------------------------
+# Database Files
+# -----------------------------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+
+# -----------------------------------------------------------------------------
+# Uploaded/Generated Content
+# -----------------------------------------------------------------------------
+uploads/
+data/
+index/
+*.index
+
+# -----------------------------------------------------------------------------
+# Testing & Coverage
+# -----------------------------------------------------------------------------
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+
+# -----------------------------------------------------------------------------
+# Jupyter Notebook
+# -----------------------------------------------------------------------------
+.ipynb_checkpoints/
+
+# -----------------------------------------------------------------------------
+# mypy & Type Checking
+# -----------------------------------------------------------------------------
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# -----------------------------------------------------------------------------
+# SECURITY OVERWRITE PROTECTION
+# The following patterns ensure no credential-like files are tracked
+# -----------------------------------------------------------------------------
+# Files with "key", "secret", "token", "password" in name
+*key*
+*secret*
+*token*
+*password*
+*passwd*
+*credential*
+*api_key*
+*apikey*
+*private*
+
+# Backup files that might contain credentials
+*.bak
+*.backup
+*.old
+*.orig
+
+# Shell scripts that might contain credentials
+*.sh
+!run.sh

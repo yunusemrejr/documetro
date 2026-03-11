@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+numpy
+scipy
+python-multipart
+beautifulsoup4
+lxml
+

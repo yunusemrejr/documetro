@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Documetro</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="brandbar" aria-label="Documetro">
+        <div class="brandbar__arrows" aria-hidden="true">
+          <span class="brandbar__arrow brandbar__arrow--top">document</span>
+          <span class="brandbar__arrow brandbar__arrow--mid">archive</span>
+          <span class="brandbar__arrow brandbar__arrow--bottom">notes</span>
+        </div>
+        <img src="/assets/documetro_transparent.png" alt="Documetro" class="brandbar__logo" />
+      </aside>
+
+      <div class="workspace">
+        <section class="upload-panel" aria-label="Upload files">
+          <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Upload documents">
+            <span class="dropzone__text">Drop files or browse</span>
+            <button id="upload-button" class="button button--primary" type="button">Browse</button>
+          </div>
+          <input id="file-input" type="file" multiple hidden />
+        </section>
+
+        <section id="chat-feed" class="chat-feed" aria-live="polite"></section>
+
+        <form id="question-form" class="composer">
+          <label class="composer__label" for="question-input">Question</label>
+          <textarea id="question-input" rows="1" placeholder="Ask about your documents…"></textarea>
+          <button id="send-button" class="button button--primary" type="submit" aria-label="Send">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </main>
+
+    <template id="welcome-template">
+      <div class="message-row message-row--assistant">
+        <div class="assistant-badge" aria-hidden="true">
+          <img src="/assets/documetro_transparent.png" alt="" />
+        </div>
+        <article class="message-card message-card--assistant">
+          <p class="message-card__text">Upload files to begin.</p>
+        </article>
+      </div>
+    </template>
+
+    <div class="corner-dock" aria-label="Documetro controls">
+      <button
+        id="info-button"
+        class="corner-button info-button"
+        type="button"
+        aria-haspopup="dialog"
+        aria-controls="info-modal"
+        aria-label="About Documetro system"
+      >
+        <span class="corner-button__glyph" aria-hidden="true">i</span>
+      </button>
+      <button
+        id="config-button"
+        class="corner-button config-button"
+        type="button"
+        aria-haspopup="dialog"
+        aria-controls="config-modal"
+        aria-label="Open provider settings"
+      >
+        <span class="corner-button__glyph config-button__glyph" aria-hidden="true">♥</span>
+      </button>
+    </div>
+
+    <div id="info-modal" class="modal" hidden>
+      <div class="modal__backdrop" data-close-modal></div>
+      <section
+        class="panel info-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="info-title"
+        aria-describedby="info-summary"
+      >
+        <button id="info-close" class="panel__close" type="button" aria-label="Close system info">Close</button>
+        <p class="panel__eyebrow">System Note</p>
+        <h2 id="info-title" class="panel__title">How Documetro Works</h2>
+        <p id="info-summary" class="panel__summary">
+          Documetro builds a temporary hybrid retrieval index from your uploaded files, then answers by combining classical search signals, dense embeddings, and provider-assisted reranking.
+        </p>
+        <p class="panel__developer">
+          This project has been developed by <a href="https://yunusemrevurgun.com" target="_blank" rel="noopener noreferrer">Yunus Emre Vurgun</a> (<a href="https://yunusemrevurgun.com" target="_blank" rel="noopener noreferrer">yunusemrevurgun.com</a>)
+        </p>
+
+        <div class="info-panel__grid">
+          <section class="info-panel__section">
+            <h3>Embeddings</h3>
+            <ul class="info-panel__list">
+              <li>Text corpus: <span id="info-text-embedding">nvidia/llama-3.2-nv-embedqa-1b-v2:free</span></li>
+              <li>Visual corpus: <span id="info-visual-embedding">nvidia/llama-nemotron-embed-vl-1b-v2:free</span></li>
+              <li>Strategy: <span id="info-embedding-strategy">One embedding space per corpus, selected by modality.</span></li>
+            </ul>
+          </section>
+
+          <section class="info-panel__section">
+            <h3>Providers</h3>
+            <ul class="info-panel__list">
+              <li>Embedding provider: <span id="info-provider">OpenRouter</span></li>
+              <li>Multimodal extraction model: <span id="info-multimodal-model">openai/gpt-4o-mini</span></li>
+              <li>Answer drafting model: <span id="info-generation-model">liquid/lfm2-8b-a1b</span></li>
+              <li>Reasoning + reranking: <span id="info-reasoning-provider">Nous Hermes</span> / <span id="info-reasoning-model">Hermes-4-70B</span></li>
+            </ul>
+          </section>
+
+          <section class="info-panel__section info-panel__section--wide">
+            <h3>Pipeline Summary</h3>
+            <ol class="info-panel__list info-panel__list--ordered">
+              <li>Uploads are parsed locally into sections and chunks.</li>
+              <li>Images, audio, and video are converted into retrieval-ready text before indexing, using the multimodal extraction model when OpenRouter is enabled.</li>
+              <li>Retrieval blends TF-IDF, latent semantic scoring, and embeddings, with embeddings as the main signal.</li>
+              <li>Nous Hermes can refine the query and rerank evidence before answer generation.</li>
+              <li>The final answer is grounded in the highest-scoring excerpts from your uploaded files.</li>
+            </ol>
+          </section>
+        </div>
+      </section>
+    </div>
+
+    <div id="config-modal" class="modal" hidden>
+      <div class="modal__backdrop" data-close-modal></div>
+      <section class="panel config-panel" role="dialog" aria-modal="true" aria-labelledby="config-title">
+        <button id="config-close" class="panel__close" type="button" aria-label="Close settings">Close</button>
+        <p class="panel__eyebrow">Provider Config</p>
+        <h2 id="config-title" class="panel__title">Keys, Models, Endpoints</h2>
+        <p class="panel__summary">
+          Update the local runtime settings for OpenRouter and Nous Hermes. Saving refreshes the provider wiring and clears the current workspace index.
+        </p>
+
+        <form id="config-form" class="config-form">
+          <section class="config-group" aria-labelledby="config-openrouter-title">
+            <div class="config-group__header">
+              <p class="config-group__eyebrow">Provider A</p>
+              <h3 id="config-openrouter-title" class="config-group__title">OpenRouter</h3>
+              <p class="config-group__summary">Embeddings, multimodal extraction, and lightweight answer drafting.</p>
+            </div>
+            <div class="config-form__grid">
+              <label class="config-field">
+                <span>API key</span>
+                <input id="openrouter-api-key" name="openrouter_api_key" type="password" autocomplete="off" />
+                <small class="config-field__meta" data-config-meta="openrouter_api_key"></small>
+              </label>
+              <label class="config-field">
+                <span>Base URL</span>
+                <input id="openrouter-base-url" name="openrouter_base_url" type="text" />
+                <small class="config-field__meta" data-config-meta="openrouter_base_url"></small>
+              </label>
+              <label class="config-field">
+                <span>Text embedding model</span>
+                <input id="openrouter-embedding-model" name="openrouter_embedding_model" type="text" />
+                <small class="config-field__meta" data-config-meta="openrouter_embedding_model"></small>
+              </label>
+              <label class="config-field">
+                <span>Multimodal embedding model</span>
+                <input id="openrouter-multimodal-embedding-model" name="openrouter_multimodal_embedding_model" type="text" />
+                <small class="config-field__meta" data-config-meta="openrouter_multimodal_embedding_model"></small>
+              </label>
+              <label class="config-field">
+                <span>Multimodal extraction model</span>
+                <input id="openrouter-multimodal-model" name="openrouter_multimodal_model" type="text" />
+                <small class="config-field__meta" data-config-meta="openrouter_multimodal_model"></small>
+              </label>
+              <label class="config-field">
+                <span>Generation model</span>
+                <input id="openrouter-generation-model" name="openrouter_generation_model" type="text" />
+                <small class="config-field__meta" data-config-meta="openrouter_generation_model"></small>
+              </label>
+            </div>
+          </section>
+
+          <section class="config-group" aria-labelledby="config-nous-title">
+            <div class="config-group__header">
+              <p class="config-group__eyebrow">Provider B</p>
+              <h3 id="config-nous-title" class="config-group__title">Nous Hermes</h3>
+              <p class="config-group__summary">Query planning and evidence reranking before final answer assembly.</p>
+            </div>
+            <div class="config-form__grid">
+              <label class="config-field">
+                <span>API key</span>
+                <input id="nous-api-key" name="nous_api_key" type="password" autocomplete="off" />
+                <small class="config-field__meta" data-config-meta="nous_api_key"></small>
+              </label>
+              <label class="config-field">
+                <span>Base URL</span>
+                <input id="nous-base-url" name="nous_base_url" type="text" />
+                <small class="config-field__meta" data-config-meta="nous_base_url"></small>
+              </label>
+              <label class="config-field config-field--wide">
+                <span>Reasoning model</span>
+                <input id="nous-reasoning-model" name="nous_reasoning_model" type="text" />
+                <small class="config-field__meta" data-config-meta="nous_reasoning_model"></small>
+              </label>
+            </div>
+          </section>
+
+          <div class="config-form__actions">
+            <p id="config-status" class="config-form__status" aria-live="polite"></p>
+            <button id="config-save" class="button button--primary" type="submit">Save Settings</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <script src="/static/app.js" type="module"></script>
+  </body>
+</html>
