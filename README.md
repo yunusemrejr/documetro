@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/documetro_transparent.png" alt="Documetro" width="220" />
+</p>
+
 # Documetro
 
 Documetro is a document intelligence workspace. It ingests mixed document batches, builds a hybrid retrieval index, and can answer questions through a split-provider RAG pipeline: OpenRouter handles embeddings, multimodal extraction, and lightweight answer drafting, while Nous Hermes handles query understanding and evidence finding.
